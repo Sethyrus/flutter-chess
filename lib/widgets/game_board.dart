@@ -44,13 +44,13 @@ class _GameBoardState extends State<GameBoard> {
           return const SizedBox();
         }
 
-        final List<Position> availableMovements = [];
-
         final List<Position> riskMovements = GameService().getRiskMovements();
 
         final Tile? selectedTile = selectedPosition != null
             ? gameBoard[selectedPosition!.x][selectedPosition!.y]
             : null;
+
+        final List<Position> availableMovements = [];
 
         GameService()
             .getAvailableMovements(selectedPosition)

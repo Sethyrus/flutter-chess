@@ -6,11 +6,15 @@ import 'package:rxdart/rxdart.dart';
 
 class GameService {
   static final GameService _instance = GameService._internal();
-  final _dataFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
-  PieceTeam _currentTurnTeam = PieceTeam.white;
 
-  List<List<Tile>> get gameBoardSync => _dataFetcher.value;
-  Stream<List<List<Tile>>> get gameBoardStream => _dataFetcher.stream;
+  final _gameBoardFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
+  final _teamTurnFetcher = BehaviorSubject<PieceTeam>()
+    ..startWith(PieceTeam.white);
+
+  List<List<Tile>> get gameBoardSync => _gameBoardFetcher.value;
+  Stream<List<List<Tile>>> get gameBoardStream => _gameBoardFetcher.stream;
+  PieceTeam get teamTurnSync => _teamTurnFetcher.value;
+  Stream<PieceTeam> get teamTurnStream => _teamTurnFetcher.stream;
 
   factory GameService() {
     return _instance;
@@ -183,7 +187,7 @@ class GameService {
     if (position != null) {
       final Piece? selectedPiece = gameBoardSync[position.x][position.y].piece;
 
-      if (!bypassTeamCheck && selectedPiece?.team != _currentTurnTeam) {
+      if (!bypassTeamCheck && selectedPiece?.team != teamTurnSync) {
         return [];
       }
 
@@ -432,7 +436,7 @@ class GameService {
     for (var x = 0; x < 8; x++) {
       for (var y = 0; y < 8; y++) {
         if (gameBoardSync[x][y].piece?.team ==
-            (_currentTurnTeam == PieceTeam.white
+            (teamTurnSync == PieceTeam.white
                 ? PieceTeam.black
                 : PieceTeam.white)) {
           getAvailableMovementsForPieceAtPosition(
@@ -465,11 +469,14 @@ class GameService {
     );
 
     newGameBoard[destinyPositon.x][destinyPositon.y] =
-        newGameBoard[destinyPositon.x][destinyPositon.y].clone(piece: piece);
+        newGameBoard[destinyPositon.x][destinyPositon.y].clone(
+      piece: piece?.clone(hasBeenMoved: true),
+    );
 
-    _currentTurnTeam =
-        _currentTurnTeam == PieceTeam.white ? PieceTeam.black : PieceTeam.white;
-    _dataFetcher.add(newGameBoard);
+    _gameBoardFetcher.add(newGameBoard);
+    _teamTurnFetcher.add(
+      teamTurnSync == PieceTeam.white ? PieceTeam.black : PieceTeam.white,
+    );
   }
 
   void resetGameBoard() {
@@ -488,8 +495,8 @@ class GameService {
       ),
     );
 
-    _currentTurnTeam = PieceTeam.white;
-    _dataFetcher.sink.add(cleanGameBoard);
+    _gameBoardFetcher.sink.add(cleanGameBoard);
+    _teamTurnFetcher.add(PieceTeam.white);
   }
 
   void restartGame() {
@@ -497,6 +504,6 @@ class GameService {
   }
 
   void dispose() {
-    _dataFetcher.close();
+    _gameBoardFetcher.close();
   }
 }

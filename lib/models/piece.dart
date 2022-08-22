@@ -15,10 +15,12 @@ enum PieceTeam {
 class Piece {
   final PieceType type;
   final PieceTeam team;
+  final bool hasBeenMoved;
 
   Piece({
     required this.type,
     required this.team,
+    this.hasBeenMoved = false,
   });
 
   String get icon {
@@ -54,5 +56,17 @@ class Piece {
             return 'lib/assets/piece_icons/king_black.svg';
         }
     }
+  }
+
+  Piece clone({
+    PieceType? type,
+    PieceTeam? team,
+    bool? hasBeenMoved,
+  }) {
+    return Piece(
+      type: type ?? this.type,
+      team: team ?? this.team,
+      hasBeenMoved: hasBeenMoved ?? this.hasBeenMoved,
+    );
   }
 }
