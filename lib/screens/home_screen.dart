@@ -4,17 +4,16 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key) {
-    GameService().resetGameMatrix();
+    GameService().resetGameBoard();
 
     Future.delayed(const Duration(seconds: 1), () {
-      GameService().startGame();
+      GameService().restartGame();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => GameService().selectTile(),
       child: Scaffold(
         backgroundColor: Colors.teal,
         body: SafeArea(

@@ -1,28 +1,16 @@
 import 'dart:async';
-import 'package:chess_one/helpers/debugger.dart';
 import 'package:chess_one/models/piece.dart';
 import 'package:chess_one/models/position.dart';
 import 'package:chess_one/models/tile.dart';
 import 'package:rxdart/rxdart.dart';
 
-enum SnakeDirection {
-  up,
-  down,
-  left,
-  right,
-}
-
 class GameService {
   static final GameService _instance = GameService._internal();
-  final _gameBoardFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
-  final _selectedPositionFetcher = BehaviorSubject<Position?>()
-    ..startWith(null);
+  final _dataFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
+  PieceTeam _currentTurnTeam = PieceTeam.white;
 
-  List<List<Tile>> get gameBoardSync => _gameBoardFetcher.value;
-  Stream<List<List<Tile>>> get gameBoardStream => _gameBoardFetcher.stream;
-  Position? get selectedPositionSync => _selectedPositionFetcher.value;
-  Stream<Position?> get selectedPositionStream =>
-      _selectedPositionFetcher.stream;
+  List<List<Tile>> get gameBoardSync => _dataFetcher.value;
+  Stream<List<List<Tile>>> get gameBoardStream => _dataFetcher.stream;
 
   factory GameService() {
     return _instance;
@@ -31,7 +19,7 @@ class GameService {
   GameService._internal();
 
   Piece? getOriginalPieceAtPosition(Position position) {
-    // Piezas principales blancas
+    // Piezas primera línea blancas
     if (position.y == 0) {
       if (position.x == 0 || position.x == 7) {
         return Piece(type: PieceType.rook, team: PieceTeam.white);
@@ -53,7 +41,7 @@ class GameService {
     else if (position.y == 6) {
       return Piece(type: PieceType.pawn, team: PieceTeam.black);
     }
-    // Piezas principales negras
+    // Piezas primera línea negras
     else if (position.y == 7) {
       if (position.x == 0 || position.x == 7) {
         return Piece(type: PieceType.rook, team: PieceTeam.black);
@@ -71,8 +59,114 @@ class GameService {
     return null;
   }
 
-  void resetGameMatrix() {
-    final List<List<Tile>> gameMatrix = List.generate(
+  List<Position> getAvailableMovementsForPieceAtPosition(
+    Position? position,
+  ) {
+    final List<Position> validPositions = [];
+
+    if (position != null) {
+      final Piece? selectedPiece = gameBoardSync[position.x][position.y].piece;
+
+      if (selectedPiece?.team != _currentTurnTeam) {
+        return [];
+      }
+
+      if (selectedPiece != null) {
+        switch (selectedPiece.type) {
+          case PieceType.pawn:
+            final bool isInitialPosition =
+                selectedPiece.team == PieceTeam.white && position.y == 1 ||
+                    selectedPiece.team == PieceTeam.black && position.y == 6;
+
+            switch (selectedPiece.team) {
+              case PieceTeam.white:
+                if (position.x > 0 &&
+                    position.y < 7 &&
+                    gameBoardSync[position.x - 1][position.y + 1].piece !=
+                        null) {
+                  validPositions.add(Position(position.x - 1, position.y + 1));
+                }
+
+                if (position.x < 7 &&
+                    position.y < 7 &&
+                    gameBoardSync[position.x + 1][position.y + 1].piece !=
+                        null) {
+                  validPositions.add(Position(position.x + 1, position.y + 1));
+                }
+
+                if (position.y < 7 &&
+                    gameBoardSync[position.x][position.y + 1].piece == null) {
+                  validPositions.add(Position(position.x, position.y + 1));
+
+                  if (isInitialPosition &&
+                      gameBoardSync[position.x][position.y + 2].piece == null) {
+                    validPositions.add(Position(position.x, position.y + 2));
+                  }
+                }
+
+                break;
+              case PieceTeam.black:
+                if (isInitialPosition) {
+                  validPositions.addAll([
+                    Position(position.x, position.y - 1),
+                    Position(position.x, position.y - 2),
+                  ]);
+                } else {
+                  validPositions.add(Position(position.x, position.y - 1));
+                }
+            }
+
+            break;
+          case PieceType.rook:
+            // TODO: Handle this case.
+            break;
+          case PieceType.knight:
+            // TODO: Handle this case.
+            break;
+          case PieceType.bishop:
+            // TODO: Handle this case.
+            break;
+          case PieceType.queen:
+            // TODO: Handle this case.
+            break;
+          case PieceType.king:
+            // TODO: Handle this case.
+            break;
+        }
+      }
+    }
+
+    return validPositions;
+  }
+
+  List<Position> getAvailableMovements(Position? position) {
+    final List<Position> availableMovements =
+        getAvailableMovementsForPieceAtPosition(position);
+
+    return availableMovements;
+  }
+
+  void movePiece(originPosition, destinyPositon) {
+    final List<List<Tile>> newGameBoard = List.from(gameBoardSync);
+    final Piece? piece = newGameBoard[originPosition.x][originPosition.y].piece;
+
+    newGameBoard[originPosition.x][originPosition.y] = Tile(
+      position: Position(
+        originPosition.x,
+        originPosition.y,
+      ),
+    );
+
+    newGameBoard[destinyPositon.x][destinyPositon.y] =
+        newGameBoard[destinyPositon.x][destinyPositon.y].clone(piece: piece);
+
+    _currentTurnTeam =
+        _currentTurnTeam == PieceTeam.white ? PieceTeam.black : PieceTeam.white;
+    _dataFetcher.add(newGameBoard);
+  }
+
+  void resetGameBoard() {
+    final List<List<Tile>> cleanGameBoard = List.generate(
       8,
       (colIndex) => List.generate(
         8,
@@ -87,20 +181,15 @@ class GameService {
       ),
     );
 
-    _gameBoardFetcher.sink.add(gameMatrix);
+    _currentTurnTeam = PieceTeam.white;
+    _dataFetcher.sink.add(cleanGameBoard);
   }
 
-  void startGame() {
-    resetGameMatrix();
-  }
-
-  void selectTile({Position? position}) {
-    Debugger.log('Selected tile: $position');
-
-    _selectedPositionFetcher.sink.add(position);
+  void restartGame() {
+    resetGameBoard();
   }
 
   void dispose() {
-    _gameBoardFetcher.close();
+    _dataFetcher.close();
   }
 }

@@ -7,18 +7,20 @@ class GameTile extends StatelessWidget {
 
   const GameTile(this.tile, {Key? key}) : super(key: key);
 
+  BoxBorder? get tileBorder {
+    if (tile.isSelected) {
+      return Border.all(color: Colors.blueGrey, width: 3);
+    } else if (tile.isMovableTile) {
+      return Border.all(color: Colors.green, width: 3);
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: tile.color,
-        border: tile.isSelected
-            ? Border.all(
-                width: 8,
-                color: Colors.green,
-              )
-            : null,
-      ),
+      decoration: BoxDecoration(color: tile.color, border: tileBorder),
       child: Stack(
         alignment: Alignment.center,
         children: [

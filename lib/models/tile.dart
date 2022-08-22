@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class Tile {
   final Position position;
   final bool isSelected;
+  final bool isMovableTile;
   final Piece? piece;
 
   Tile({
     required this.position,
     this.isSelected = false,
+    this.isMovableTile = false,
     this.piece,
   });
 
@@ -24,10 +26,12 @@ class Tile {
   Tile clone({
     Piece? piece,
     bool? isSelected,
+    bool? isMovableTile,
   }) {
     return Tile(
       position: position,
       isSelected: isSelected ?? this.isSelected,
+      isMovableTile: isMovableTile ?? this.isMovableTile,
       piece: piece ?? this.piece,
     );
   }
