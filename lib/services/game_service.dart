@@ -174,14 +174,16 @@ class GameService {
   }
 
   List<Position> getAvailableMovementsForPieceAtPosition(
-    Position? position,
-  ) {
+    Position? position, {
+    bool onlyRiskMovements = false,
+    bool bypassTeamCheck = false,
+  }) {
     final List<Position> validPositions = [];
 
     if (position != null) {
       final Piece? selectedPiece = gameBoardSync[position.x][position.y].piece;
 
-      if (selectedPiece?.team != _currentTurnTeam) {
+      if (!bypassTeamCheck && selectedPiece?.team != _currentTurnTeam) {
         return [];
       }
 
@@ -197,21 +199,28 @@ class GameService {
                 // "Comer" a la izquierda
                 if (position.x > 0 &&
                     position.y < 7 &&
-                    gameBoardSync[position.x - 1][position.y + 1].piece?.team ==
-                        PieceTeam.black) {
+                    (onlyRiskMovements ||
+                        gameBoardSync[position.x - 1][position.y + 1]
+                                .piece
+                                ?.team ==
+                            PieceTeam.black)) {
                   validPositions.add(Position(position.x - 1, position.y + 1));
                 }
 
                 // "Comer" a la derecha
                 if (position.x < 7 &&
                     position.y < 7 &&
-                    gameBoardSync[position.x + 1][position.y + 1].piece?.team ==
-                        PieceTeam.black) {
+                    (onlyRiskMovements ||
+                        gameBoardSync[position.x + 1][position.y + 1]
+                                .piece
+                                ?.team ==
+                            PieceTeam.black)) {
                   validPositions.add(Position(position.x + 1, position.y + 1));
                 }
 
                 // Avanzar
-                if (position.y < 7 &&
+                if (!onlyRiskMovements &&
+                    position.y < 7 &&
                     gameBoardSync[position.x][position.y + 1].piece == null) {
                   validPositions.add(Position(position.x, position.y + 1));
 
@@ -226,21 +235,28 @@ class GameService {
                 // "Comer" a la izquierda
                 if (position.x > 0 &&
                     position.y > 0 &&
-                    gameBoardSync[position.x - 1][position.y - 1].piece?.team ==
-                        PieceTeam.white) {
+                    (onlyRiskMovements ||
+                        gameBoardSync[position.x - 1][position.y - 1]
+                                .piece
+                                ?.team ==
+                            PieceTeam.white)) {
                   validPositions.add(Position(position.x - 1, position.y - 1));
                 }
 
                 // "Comer" a la derecha
                 if (position.x < 7 &&
                     position.y > 0 &&
-                    gameBoardSync[position.x + 1][position.y - 1].piece?.team ==
-                        PieceTeam.white) {
+                    (onlyRiskMovements ||
+                        gameBoardSync[position.x + 1][position.y - 1]
+                                .piece
+                                ?.team ==
+                            PieceTeam.white)) {
                   validPositions.add(Position(position.x + 1, position.y - 1));
                 }
 
                 // Avanzar
-                if (position.y > 0 &&
+                if (!onlyRiskMovements &&
+                    position.y > 0 &&
                     gameBoardSync[position.x][position.y - 1].piece == null) {
                   validPositions.add(Position(position.x, position.y - 1));
 
@@ -408,6 +424,33 @@ class GameService {
         getAvailableMovementsForPieceAtPosition(position);
 
     return availableMovements;
+  }
+
+  List<Position> getRiskMovements() {
+    final List<Position> riskTiles = [];
+
+    for (var x = 0; x < 8; x++) {
+      for (var y = 0; y < 8; y++) {
+        if (gameBoardSync[x][y].piece?.team ==
+            (_currentTurnTeam == PieceTeam.white
+                ? PieceTeam.black
+                : PieceTeam.white)) {
+          getAvailableMovementsForPieceAtPosition(
+            Position(x, y),
+            onlyRiskMovements: true,
+            bypassTeamCheck: true,
+          ).forEach((position) {
+            if (!riskTiles.any(
+              ((tile) => tile.x == position.x && tile.y == position.y),
+            )) {
+              riskTiles.add(position);
+            }
+          });
+        }
+      }
+    }
+
+    return riskTiles;
   }
 
   void movePiece(originPosition, destinyPositon) {

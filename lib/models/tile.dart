@@ -6,12 +6,14 @@ class Tile {
   final Position position;
   final bool isSelected;
   final bool isMovableTile;
+  final bool isRiskTile;
   final Piece? piece;
 
   Tile({
     required this.position,
     this.isSelected = false,
     this.isMovableTile = false,
+    this.isRiskTile = false,
     this.piece,
   });
 
@@ -27,11 +29,13 @@ class Tile {
     Piece? piece,
     bool? isSelected,
     bool? isMovableTile,
+    bool? isRiskTile,
   }) {
     return Tile(
       position: position,
       isSelected: isSelected ?? this.isSelected,
       isMovableTile: isMovableTile ?? this.isMovableTile,
+      isRiskTile: isRiskTile ?? this.isRiskTile,
       piece: piece ?? this.piece,
     );
   }
