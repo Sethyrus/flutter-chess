@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:chess_one/helpers/debugger.dart';
 import 'package:chess_one/models/piece.dart';
 import 'package:chess_one/models/position.dart';
 import 'package:chess_one/models/tile.dart';
@@ -13,10 +14,15 @@ enum SnakeDirection {
 
 class GameService {
   static final GameService _instance = GameService._internal();
-  final _dataFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
+  final _gameBoardFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
+  final _selectedPositionFetcher = BehaviorSubject<Position?>()
+    ..startWith(null);
 
-  List<List<Tile>> get gameMatrixSync => _dataFetcher.value;
-  Stream<List<List<Tile>>> get gameMatrixStream => _dataFetcher.stream;
+  List<List<Tile>> get gameBoardSync => _gameBoardFetcher.value;
+  Stream<List<List<Tile>>> get gameBoardStream => _gameBoardFetcher.stream;
+  Position? get selectedPositionSync => _selectedPositionFetcher.value;
+  Stream<Position?> get selectedPositionStream =>
+      _selectedPositionFetcher.stream;
 
   factory GameService() {
     return _instance;
@@ -81,14 +87,20 @@ class GameService {
       ),
     );
 
-    _dataFetcher.add(gameMatrix);
+    _gameBoardFetcher.sink.add(gameMatrix);
   }
 
   void startGame() {
     resetGameMatrix();
   }
 
+  void selectTile({Position? position}) {
+    Debugger.log('Selected tile: $position');
+
+    _selectedPositionFetcher.sink.add(position);
+  }
+
   void dispose() {
-    _dataFetcher.close();
+    _gameBoardFetcher.close();
   }
 }

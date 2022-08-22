@@ -10,17 +10,23 @@ class GameTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: tile.color,
+      decoration: BoxDecoration(
+        color: tile.color,
+        border: tile.isSelected
+            ? Border.all(
+                width: 8,
+                color: Colors.green,
+              )
+            : null,
+      ),
       child: Stack(
+        alignment: Alignment.center,
         children: [
           if (tile.piece != null)
             SvgPicture.asset(
               tile.piece!.icon,
-              // semanticsLabel: 'van icon',
-              // width: 18,
-              // height: 18,
-              // fit: BoxFit.fitWidth,
-              // color: grey,
+              width: double.infinity,
+              height: double.infinity,
             ),
         ],
       ),

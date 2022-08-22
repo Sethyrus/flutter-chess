@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 class Tile {
   final Position position;
+  final bool isSelected;
   final Piece? piece;
 
   Tile({
     required this.position,
+    this.isSelected = false,
     this.piece,
   });
 
@@ -17,5 +19,16 @@ class Tile {
     } else {
       return Colors.brown.shade500;
     }
+  }
+
+  Tile clone({
+    Piece? piece,
+    bool? isSelected,
+  }) {
+    return Tile(
+      position: position,
+      isSelected: isSelected ?? this.isSelected,
+      piece: piece ?? this.piece,
+    );
   }
 }

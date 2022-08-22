@@ -1,3 +1,4 @@
+import 'package:chess_one/models/position.dart';
 import 'package:chess_one/models/tile.dart';
 import 'package:chess_one/services/game_service.dart';
 import 'package:chess_one/widgets/game_tile.dart';
@@ -23,31 +24,64 @@ class GameBoard extends StatelessWidget {
     tileSize = (minSideSize) / 16;
 
     return StreamBuilder(
-      stream: GameService().gameMatrixStream,
-      builder: (context, AsyncSnapshot<List<List<Tile>>> gameMatrixSnapshot) {
-        final List<List<Tile>>? gameMatrix =
-            gameMatrixSnapshot.hasData ? gameMatrixSnapshot.data : null;
+        stream: GameService().gameBoardStream,
+        builder: (
+          context,
+          AsyncSnapshot<List<List<Tile>>> gameMatrixSnapshot,
+        ) {
+          final List<List<Tile>>? gameMatrix =
+              gameMatrixSnapshot.hasData ? gameMatrixSnapshot.data : null;
 
-        if (gameMatrix == null) {
-          return const SizedBox();
-        }
+          if (gameMatrix == null) {
+            return const SizedBox();
+          }
 
-        return Row(
-          children: List.generate(
-            gameMatrix.length,
-            (colIndex) => Column(
-              children: List.generate(
-                gameMatrix.length,
-                (rowIndex) => SizedBox(
-                  height: tileSize,
-                  width: tileSize,
-                  child: GameTile(gameMatrix[colIndex][rowIndex]),
+          return StreamBuilder(
+            stream: GameService().selectedPositionStream,
+            builder: (
+              context,
+              AsyncSnapshot<Position?> selectedPositionSnapshot,
+            ) {
+              final Position? selectedPosition =
+                  selectedPositionSnapshot.hasData
+                      ? selectedPositionSnapshot.data
+                      : null;
+
+              return Row(
+                children: List.generate(
+                  gameMatrix.length,
+                  (colIndex) => Column(
+                    children: List.generate(
+                      gameMatrix.length,
+                      (rowIndex) {
+                        final isTileSelected = selectedPosition == null
+                            ? false
+                            : selectedPosition.x == colIndex &&
+                                selectedPosition.y == rowIndex;
+
+                        return GestureDetector(
+                          onTap: () => GameService().selectTile(
+                            position: Position(colIndex, rowIndex),
+                          ),
+                          child: SizedBox(
+                            height: tileSize,
+                            width: tileSize,
+                            child: GameTile(
+                              isTileSelected
+                                  ? gameMatrix[colIndex][rowIndex].clone(
+                                      isSelected: true,
+                                    )
+                                  : gameMatrix[colIndex][rowIndex],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+              );
+            },
+          );
+        });
   }
 }
