@@ -86,12 +86,14 @@ class _GameBoardState extends State<GameBoard> {
                       if (isMovableTile) {
                         GameService().movePiece(
                           selectedPosition!,
-                          Position(colIndex, rowIndex),
+                          availableMovements.firstWhere((position) =>
+                              position.x == colIndex && position.y == rowIndex),
                         );
                       }
 
                       setState(() {
-                        selectedPosition = Position(colIndex, rowIndex);
+                        selectedPosition =
+                            gameBoard[colIndex][rowIndex].position;
                       });
                     },
                     child: SizedBox(

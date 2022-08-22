@@ -12,6 +12,8 @@ class GameTile extends StatelessWidget {
       return Border.all(color: Colors.blueGrey, width: 3);
     } else if (tile.isMovableTile) {
       return Border.all(color: Colors.green, width: 3);
+    } else if (tile.piece?.hasBeenMoved == true) {
+      // return Border.all(color: Colors.orange, width: 3);
     } else if (tile.isRiskTile) {
       // return Border.all(color: Colors.red, width: 3);
     }

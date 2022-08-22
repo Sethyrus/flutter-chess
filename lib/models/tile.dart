@@ -26,13 +26,14 @@ class Tile {
   }
 
   Tile clone({
+    Position? position,
     Piece? piece,
     bool? isSelected,
     bool? isMovableTile,
     bool? isRiskTile,
   }) {
     return Tile(
-      position: position,
+      position: position ?? this.position,
       isSelected: isSelected ?? this.isSelected,
       isMovableTile: isMovableTile ?? this.isMovableTile,
       isRiskTile: isRiskTile ?? this.isRiskTile,

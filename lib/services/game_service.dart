@@ -415,6 +415,50 @@ class GameService {
                     selectedPiece.team) {
               validPositions.add(Position(position.x - 1, position.y + 1));
             }
+            // Enroque blancas
+            if (selectedPiece.team == PieceTeam.white) {
+              // Enroque corto blancas
+              if (!onlyRiskMovements &&
+                  !selectedPiece.hasBeenMoved &&
+                  gameBoardSync[0][0].piece?.hasBeenMoved == false) {
+                if (gameBoardSync[1][0].piece == null &&
+                    gameBoardSync[2][0].piece == null) {
+                  validPositions.add(Position(1, 0, isCastling: true));
+                }
+              }
+              // Enroque largo blancas
+              if (!onlyRiskMovements &&
+                  !selectedPiece.hasBeenMoved &&
+                  gameBoardSync[7][0].piece?.hasBeenMoved == false) {
+                if (gameBoardSync[6][0].piece == null &&
+                    gameBoardSync[5][0].piece == null &&
+                    gameBoardSync[4][0].piece == null) {
+                  validPositions.add(Position(5, 0, isCastling: true));
+                }
+              }
+            }
+            // Enroque negras
+            if (selectedPiece.team == PieceTeam.black) {
+              // Enroque corto negras
+              if (!onlyRiskMovements &&
+                  !selectedPiece.hasBeenMoved &&
+                  gameBoardSync[7][7].piece?.hasBeenMoved == false) {
+                if (gameBoardSync[1][7].piece == null &&
+                    gameBoardSync[2][7].piece == null) {
+                  validPositions.add(Position(1, 7, isCastling: true));
+                }
+              }
+              // Enroque largo negras
+              if (!onlyRiskMovements &&
+                  !selectedPiece.hasBeenMoved &&
+                  gameBoardSync[0][7].piece?.hasBeenMoved == false) {
+                if (gameBoardSync[6][7].piece == null &&
+                    gameBoardSync[5][7].piece == null &&
+                    gameBoardSync[4][7].piece == null) {
+                  validPositions.add(Position(5, 7, isCastling: true));
+                }
+              }
+            }
             break;
         }
       }
@@ -457,8 +501,8 @@ class GameService {
     return riskTiles;
   }
 
-  void movePiece(originPosition, destinyPositon) {
-    final List<List<Tile>> newGameBoard = List.from(gameBoardSync);
+  void movePiece(Position originPosition, Position destinyPosition) {
+    final List<List<Tile>> newGameBoard = gameBoardSync;
     final Piece? piece = newGameBoard[originPosition.x][originPosition.y].piece;
 
     newGameBoard[originPosition.x][originPosition.y] = Tile(
@@ -468,10 +512,43 @@ class GameService {
       ),
     );
 
-    newGameBoard[destinyPositon.x][destinyPositon.y] =
-        newGameBoard[destinyPositon.x][destinyPositon.y].clone(
+    newGameBoard[destinyPosition.x][destinyPosition.y] =
+        newGameBoard[originPosition.x][originPosition.y].clone(
       piece: piece?.clone(hasBeenMoved: true),
+      position: Position(destinyPosition.x, destinyPosition.y),
     );
+
+    if (destinyPosition.isCastling) {
+      if (piece?.team == PieceTeam.white) {
+        if (destinyPosition.x == 5) {
+          newGameBoard[4][0] = newGameBoard[7][0].clone(
+            piece: newGameBoard[7][0].piece?.clone(hasBeenMoved: true),
+            position: Position(4, 0),
+          );
+          newGameBoard[7][0] = Tile(position: Position(7, 0));
+        } else if (destinyPosition.x == 1) {
+          newGameBoard[2][0] = newGameBoard[0][0].clone(
+            piece: newGameBoard[0][0].piece?.clone(hasBeenMoved: true),
+            position: Position(2, 0),
+          );
+          newGameBoard[0][0] = Tile(position: Position(0, 0));
+        }
+      } else if (piece?.team == PieceTeam.black) {
+        if (destinyPosition.x == 1) {
+          newGameBoard[2][7] = newGameBoard[0][7].clone(
+            piece: newGameBoard[0][7].piece?.clone(hasBeenMoved: true),
+            position: Position(2, 7),
+          );
+          newGameBoard[0][7] = Tile(position: Position(0, 7));
+        } else if (destinyPosition.x == 5) {
+          newGameBoard[4][7] = newGameBoard[7][7].clone(
+            piece: newGameBoard[7][7].piece?.clone(hasBeenMoved: true),
+            position: Position(4, 7),
+          );
+          newGameBoard[7][7] = Tile(position: Position(7, 7));
+        }
+      }
+    }
 
     _gameBoardFetcher.add(newGameBoard);
     _teamTurnFetcher.add(
