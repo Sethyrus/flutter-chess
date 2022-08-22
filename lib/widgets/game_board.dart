@@ -65,8 +65,6 @@ class _GameBoardState extends State<GameBoard> {
                   return GestureDetector(
                     onTap: () {
                       if (isMovableTile) {
-                        Debugger.log("Mover!");
-
                         GameService().movePiece(
                           selectedPosition!,
                           Position(colIndex, rowIndex),
