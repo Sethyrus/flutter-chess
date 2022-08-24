@@ -29,7 +29,7 @@ class _GameBoardState extends State<GameBoard> {
       minSideSize = screenHeight;
     }
 
-    tileSize = (minSideSize) / 16;
+    tileSize = ((minSideSize - 200) / 8);
 
     return StreamBuilder(
       stream: GameService().gameBoardStream,

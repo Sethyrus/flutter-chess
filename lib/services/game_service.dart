@@ -8,12 +8,16 @@ import 'package:rxdart/rxdart.dart';
 class GameService {
   static final GameService _instance = GameService._internal();
 
+  final _gameStartFetcher = BehaviorSubject<bool>()..startWith(false);
   final _gameBoardFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
   final _teamTurnFetcher = BehaviorSubject<PieceTeam>()
     ..startWith(PieceTeam.white);
 
-  List<List<Tile>> get gameBoardSync =>
-      Utils.deepCloneList(_gameBoardFetcher.value);
+  bool get gameStartSync => _gameStartFetcher.value;
+  Stream<bool> get gameStartStream => _gameStartFetcher.stream;
+  List<List<Tile>> get gameBoardSync => Utils.deepCloneList(
+        _gameBoardFetcher.value,
+      );
   Stream<List<List<Tile>>> get gameBoardStream => _gameBoardFetcher.stream;
   PieceTeam get teamTurnSync => _teamTurnFetcher.value;
   Stream<PieceTeam> get teamTurnStream => _teamTurnFetcher.stream;
@@ -73,8 +77,8 @@ class GameService {
       }
     }
 
-    _gameBoardFetcher.add(newGameBoard);
-    _teamTurnFetcher.add(
+    _gameBoardFetcher.sink.add(newGameBoard);
+    _teamTurnFetcher.sink.add(
       teamTurnSync == PieceTeam.white ? PieceTeam.black : PieceTeam.white,
     );
   }
@@ -96,11 +100,12 @@ class GameService {
     );
 
     _gameBoardFetcher.sink.add(cleanGameBoard);
-    _teamTurnFetcher.add(PieceTeam.white);
   }
 
   void restartGame() {
+    _gameStartFetcher.sink.add(true);
     resetGameBoard();
+    _teamTurnFetcher.sink.add(PieceTeam.white);
   }
 
   void dispose() {

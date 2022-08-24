@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key) {
-    GameService().resetGameBoard();
-
     Future.delayed(const Duration(seconds: 1), () {
       GameService().restartGame();
     });
