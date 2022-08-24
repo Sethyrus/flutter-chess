@@ -1,4 +1,4 @@
-import 'package:chess_one/models/piece.dart';
+import 'package:chess_one/helpers/utils.dart';
 import 'package:chess_one/models/position.dart';
 import 'package:chess_one/models/tile.dart';
 import 'package:chess_one/services/game_service.dart';
@@ -44,26 +44,17 @@ class _GameBoardState extends State<GameBoard> {
           return const SizedBox();
         }
 
-        final List<Position> riskMovements = GameService().getRiskMovements();
+        // final List<Position> riskMovements = Utils.getRiskPositions(
+        //   gameBoard: gameBoard,
+        //   teamTurn: GameService().teamTurnSync,
+        // );
 
-        final Tile? selectedTile = selectedPosition != null
-            ? gameBoard[selectedPosition!.x][selectedPosition!.y]
-            : null;
-
-        final List<Position> availableMovements = [];
-
-        GameService()
-            .getAvailableMovements(selectedPosition)
-            .forEach((Position position) {
-          if (selectedTile?.piece?.type == PieceType.king) {
-            if (!riskMovements.any((Position riskPosition) =>
-                riskPosition.x == position.x && riskPosition.y == position.y)) {
-              availableMovements.add(position);
-            }
-          } else {
-            availableMovements.add(position);
-          }
-        });
+        final List<Position> availableMovements =
+            Utils.getAvailableMovementsForPosition(
+          position: selectedPosition,
+          gameBoard: gameBoard,
+          teamTurn: GameService().teamTurnSync,
+        );
 
         return Row(
           children: List.generate(
@@ -78,8 +69,8 @@ class _GameBoardState extends State<GameBoard> {
                   final isMovableTile = availableMovements.any((position) =>
                       position.x == colIndex && position.y == rowIndex);
 
-                  final isRiskTile = riskMovements.any((position) =>
-                      position.x == colIndex && position.y == rowIndex);
+                  // final isRiskTile = riskMovements.any((position) =>
+                  //     position.x == colIndex && position.y == rowIndex);
 
                   return GestureDetector(
                     onTap: () {
@@ -100,11 +91,12 @@ class _GameBoardState extends State<GameBoard> {
                       height: tileSize,
                       width: tileSize,
                       child: GameTile(
-                        isSelected || isMovableTile || isRiskTile
+                        isSelected || isMovableTile
+                            //  || isRiskTile
                             ? gameBoard[colIndex][rowIndex].clone(
                                 isSelected: isSelected,
                                 isMovableTile: isMovableTile,
-                                isRiskTile: isRiskTile,
+                                // isRiskTile: isRiskTile,
                               )
                             : gameBoard[colIndex][rowIndex],
                       ),
