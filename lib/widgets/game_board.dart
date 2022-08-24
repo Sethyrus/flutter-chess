@@ -48,7 +48,7 @@ class _GameBoardState extends State<GameBoard> {
             Utils.getAvailableMovementsForPosition(
           position: selectedPosition,
           gameBoard: gameBoard,
-          teamTurn: GameService().teamTurnSync,
+          turnTeam: GameService().turnTeamSync,
         );
 
         return Row(

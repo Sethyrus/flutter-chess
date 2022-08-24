@@ -9,12 +9,12 @@ class Utils {
 
   static Position? getKingPosition({
     required List<List<Tile>> gameBoard,
-    required PieceTeam teamTurn,
+    required PieceTeam turnTeam,
   }) {
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
         if (gameBoard[i][j].piece?.type == PieceType.king &&
-            gameBoard[i][j].piece?.team == teamTurn) {
+            gameBoard[i][j].piece?.team == turnTeam) {
           return Position(i, j);
         }
       }
@@ -26,7 +26,7 @@ class Utils {
   // Devuelve las posiciones de riesgo del tablero para el equipo seleccionado
   static List<Position> getRiskPositions({
     required List<List<Tile>> gameBoard,
-    required PieceTeam teamTurn,
+    required PieceTeam turnTeam,
   }) {
     final List<Position> riskTiles = [];
 
@@ -35,10 +35,10 @@ class Utils {
     for (var x = 0; x < 8; x++) {
       for (var y = 0; y < 8; y++) {
         if (board[x][y].piece?.team ==
-            (teamTurn == PieceTeam.white ? PieceTeam.black : PieceTeam.white)) {
+            (turnTeam == PieceTeam.white ? PieceTeam.black : PieceTeam.white)) {
           getAvailableMovementsForPosition(
             gameBoard: gameBoard,
-            teamTurn: teamTurn,
+            turnTeam: turnTeam,
             position: board[x][y].position,
             onlyKillMovements: true,
             bypassPieceTeamCheck: true,
@@ -58,19 +58,19 @@ class Utils {
   }
 
   static bool isKingInCheck({
-    required PieceTeam teamTurn,
+    required PieceTeam turnTeam,
     required List<List<Tile>> gameBoard,
   }) {
     final Position? kingPosition = getKingPosition(
       gameBoard: gameBoard,
-      teamTurn: teamTurn,
+      turnTeam: turnTeam,
     );
 
     if (kingPosition == null) return false;
 
     final List<Position> riskPositions = getRiskPositions(
       gameBoard: gameBoard,
-      teamTurn: teamTurn,
+      turnTeam: turnTeam,
     );
 
     return riskPositions.any(((position) {
@@ -252,7 +252,7 @@ class Utils {
 
   static List<Position> getAvailableMovementsForPosition({
     required List<List<Tile>> gameBoard,
-    required PieceTeam teamTurn,
+    required PieceTeam turnTeam,
     required Position? position,
     bool onlyKillMovements = false,
     bool bypassPieceTeamCheck = false,
@@ -264,7 +264,7 @@ class Utils {
       // Posible pieza en la posición seleccionada
       final Piece? selectedPiece = gameBoard[position.x][position.y].piece;
 
-      if (!bypassPieceTeamCheck && selectedPiece?.team != teamTurn) return [];
+      if (!bypassPieceTeamCheck && selectedPiece?.team != turnTeam) return [];
 
       if (selectedPiece != null) {
         switch (selectedPiece.type) {
@@ -543,7 +543,7 @@ class Utils {
           );
 
           // Si tras el movimiento el rey quedara en jaque se elimina el movimiento
-          if (isKingInCheck(gameBoard: movementResult, teamTurn: teamTurn)) {
+          if (isKingInCheck(gameBoard: movementResult, turnTeam: turnTeam)) {
             validPositions.removeAt(i - 1);
           }
         }
@@ -592,5 +592,35 @@ class Utils {
     }
 
     return null;
+  }
+
+  static bool checkTeamHasValidMovements({
+    required PieceTeam turnTeam,
+    required List<List<Tile>> gameBoard,
+  }) {
+    bool hasValidMovements = false;
+    int i = 0;
+
+    while (i < 7 && !hasValidMovements) {
+      i++;
+
+      int j = 0;
+
+      while (j < 7 && !hasValidMovements) {
+        j++;
+
+        if (gameBoard[i][j].piece?.team == turnTeam) {
+          if (getAvailableMovementsForPosition(
+            gameBoard: gameBoard,
+            turnTeam: turnTeam,
+            position: gameBoard[i][j].position,
+          ).isNotEmpty) {
+            hasValidMovements = true;
+          }
+        }
+      }
+    }
+
+    return hasValidMovements;
   }
 }

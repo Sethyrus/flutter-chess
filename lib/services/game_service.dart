@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:chess_one/helpers/debugger.dart';
 import 'package:chess_one/helpers/utils.dart';
 import 'package:chess_one/models/piece.dart';
 import 'package:chess_one/models/position.dart';
@@ -10,8 +11,9 @@ class GameService {
 
   final _gameStartFetcher = BehaviorSubject<bool>()..startWith(false);
   final _gameBoardFetcher = BehaviorSubject<List<List<Tile>>>()..startWith([]);
-  final _teamTurnFetcher = BehaviorSubject<PieceTeam>()
+  final _turnTeamFetcher = BehaviorSubject<PieceTeam>()
     ..startWith(PieceTeam.white);
+  final _winnerTeamFetcher = BehaviorSubject<PieceTeam?>();
 
   bool get gameStartSync => _gameStartFetcher.value;
   Stream<bool> get gameStartStream => _gameStartFetcher.stream;
@@ -19,8 +21,10 @@ class GameService {
         _gameBoardFetcher.value,
       );
   Stream<List<List<Tile>>> get gameBoardStream => _gameBoardFetcher.stream;
-  PieceTeam get teamTurnSync => _teamTurnFetcher.value;
-  Stream<PieceTeam> get teamTurnStream => _teamTurnFetcher.stream;
+  PieceTeam get turnTeamSync => _turnTeamFetcher.value;
+  Stream<PieceTeam> get turnTeamStream => _turnTeamFetcher.stream;
+  PieceTeam? get winnerTeamSync => _winnerTeamFetcher.value;
+  Stream<PieceTeam?> get winnerTeamStream => _winnerTeamFetcher.stream;
 
   factory GameService() {
     return _instance;
@@ -96,16 +100,28 @@ class GameService {
       }
     }
 
+    PieceTeam currentTurn = turnTeamSync;
+
+    PieceTeam newTurnTeam =
+        currentTurn == PieceTeam.white ? PieceTeam.black : PieceTeam.white;
+
     _gameBoardFetcher.sink.add(newGameBoard);
-    _teamTurnFetcher.sink.add(
-      teamTurnSync == PieceTeam.white ? PieceTeam.black : PieceTeam.white,
-    );
+    _turnTeamFetcher.sink.add(newTurnTeam);
+
+    if (!Utils.checkTeamHasValidMovements(
+      gameBoard: newGameBoard,
+      turnTeam: newTurnTeam,
+    )) {
+      Debugger.log('Fin del juego');
+
+      _winnerTeamFetcher.sink.add(currentTurn);
+    }
   }
 
   void restartGame() {
     _gameStartFetcher.sink.add(true);
     _resetGameBoard();
-    _teamTurnFetcher.sink.add(PieceTeam.white);
+    _turnTeamFetcher.sink.add(PieceTeam.white);
   }
 
   void finishGame() {

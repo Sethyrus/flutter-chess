@@ -8,32 +8,54 @@ class CurrentTurn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: GameService().teamTurnStream,
-      builder: (
-        context,
-        AsyncSnapshot<PieceTeam> teamTurnSnapshot,
-      ) {
-        if (!teamTurnSnapshot.hasData) {
-          return const SizedBox();
-        }
+        stream: GameService().winnerTeamStream,
+        builder: (
+          context,
+          AsyncSnapshot<PieceTeam?> winnerTeamSnapshot,
+        ) {
+          PieceTeam? winner =
+              winnerTeamSnapshot.hasData ? winnerTeamSnapshot.data : null;
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Mueven ${teamTurnSnapshot.data == PieceTeam.white ? 'blancas' : 'negras'}',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: teamTurnSnapshot.data == PieceTeam.white
-                    ? Colors.white
-                    : Colors.black,
-              ),
-            ),
-          ],
-        );
-      },
-    );
+          return StreamBuilder(
+            stream: GameService().turnTeamStream,
+            builder: (
+              context,
+              AsyncSnapshot<PieceTeam> turnTeamSnapshot,
+            ) {
+              if (!turnTeamSnapshot.hasData) {
+                return const SizedBox();
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (winner == null)
+                    Text(
+                      'Mueven ${turnTeamSnapshot.data == PieceTeam.white ? 'blancas' : 'negras'}',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: turnTeamSnapshot.data == PieceTeam.white
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                  if (winner != null)
+                    Text(
+                      'Ganan ${winner == PieceTeam.white ? 'blancas' : 'negras'}',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: winner == PieceTeam.white
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                ],
+              );
+            },
+          );
+        });
   }
 }
