@@ -4,16 +4,7 @@ import 'package:chess_one/models/tile.dart';
 
 class Utils {
   static List<List<T>> deepCloneList<T>(List<List<T>> list) {
-    List<List<T>> newList = [];
-
-    for (var i = 0; i < list.length; i++) {
-      newList.add([]);
-      for (var j = 0; j < list[i].length; j++) {
-        newList[i].add(list[i][j]);
-      }
-    }
-
-    return newList;
+    return list.map<List<T>>((el) => List.from(el)).toList();
   }
 
   static Position? getKingPosition({

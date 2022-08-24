@@ -8,8 +8,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Chess One',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomeScreen(),
+      theme: ThemeData(primarySwatch: Colors.teal),
+      home: const HomeScreen(),
     );
   }
 }

@@ -8,37 +8,32 @@ class CurrentTurn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: GameService().teamTurnStream,
-        builder: (
-          context,
-          AsyncSnapshot<PieceTeam> teamTurnSnapshot,
-        ) {
-          if (!teamTurnSnapshot.hasData) {
-            return const SizedBox();
-          }
+      stream: GameService().teamTurnStream,
+      builder: (
+        context,
+        AsyncSnapshot<PieceTeam> teamTurnSnapshot,
+      ) {
+        if (!teamTurnSnapshot.hasData) {
+          return const SizedBox();
+        }
 
-          return Column(
-            children: [
-              const Text(
-                'Turno actual',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Mueven ${teamTurnSnapshot.data == PieceTeam.white ? 'blancas' : 'negras'}',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: teamTurnSnapshot.data == PieceTeam.white
+                    ? Colors.white
+                    : Colors.black,
               ),
-              Text(
-                teamTurnSnapshot.data == PieceTeam.white ? 'Blancas' : 'Negras',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: teamTurnSnapshot.data == PieceTeam.white
-                      ? Colors.white
-                      : Colors.black,
-                ),
-              ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      },
+    );
   }
 }

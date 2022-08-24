@@ -28,6 +28,25 @@ class GameService {
 
   GameService._internal();
 
+  void _resetGameBoard() {
+    final List<List<Tile>> cleanGameBoard = List.generate(
+      8,
+      (colIndex) => List.generate(
+        8,
+        (rowIndex) {
+          final Position position = Position(colIndex, rowIndex);
+
+          return Tile(
+            position: position,
+            piece: Utils.getOriginalPieceAtPosition(position),
+          );
+        },
+      ),
+    );
+
+    _gameBoardFetcher.sink.add(cleanGameBoard);
+  }
+
   void movePiece(Position originPosition, Position destinyPosition) {
     final List<List<Tile>> newGameBoard = gameBoardSync;
     final Piece? piece = newGameBoard[originPosition.x][originPosition.y].piece;
@@ -83,29 +102,14 @@ class GameService {
     );
   }
 
-  void resetGameBoard() {
-    final List<List<Tile>> cleanGameBoard = List.generate(
-      8,
-      (colIndex) => List.generate(
-        8,
-        (rowIndex) {
-          final Position position = Position(colIndex, rowIndex);
-
-          return Tile(
-            position: position,
-            piece: Utils.getOriginalPieceAtPosition(position),
-          );
-        },
-      ),
-    );
-
-    _gameBoardFetcher.sink.add(cleanGameBoard);
-  }
-
   void restartGame() {
     _gameStartFetcher.sink.add(true);
-    resetGameBoard();
+    _resetGameBoard();
     _teamTurnFetcher.sink.add(PieceTeam.white);
+  }
+
+  void finishGame() {
+    _gameStartFetcher.sink.add(false);
   }
 
   void dispose() {

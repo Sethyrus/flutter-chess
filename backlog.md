@@ -1,3 +1,4 @@
 - Desarrollar forma para determinar fin de la partida
-  - Si el Rey está en jaque, el turno solo puede terminar fuera de él
   - Se debe poder comprobar si hay movimientos que saquen del jaque al rey
+- Matrix -> Board
+- Si el rey está en jaque, indicar
