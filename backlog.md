@@ -1,4 +1,4 @@
-- Desarrollar forma para determinar fin de la partida
-  - Se debe poder comprobar si hay movimientos que saquen del jaque al rey
 - Matrix -> Board
 - Si el rey está en jaque, indicar
+- Histórico de movimientos
+  - Poder revertir movimientos

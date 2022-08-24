@@ -20,7 +20,26 @@ class OptionsButton extends StatelessWidget {
           children: [
             SizedBox(
               width: double.infinity,
-              child: TextButton(
+              child: ElevatedButton(
+                child: const Text('Reiniciar partida'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+
+                  Alert.showConfirm(
+                    context: context,
+                    title: 'Confirmar',
+                    content: '¿Quieres reiniciar la partida?',
+                  ).then((confirmed) {
+                    if (confirmed == true) {
+                      GameService().restartGame();
+                    }
+                  });
+                },
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
                 child: const Text('Abandonar partida'),
                 onPressed: () {
                   Navigator.of(context).pop();

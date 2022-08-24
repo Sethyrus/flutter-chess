@@ -1,3 +1,4 @@
+import 'package:chess_one/helpers/alert.dart';
 import 'package:chess_one/services/game_service.dart';
 import 'package:chess_one/widgets/current_turn.dart';
 import 'package:chess_one/widgets/game_board.dart';
@@ -10,50 +11,57 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Scaffold(
-        backgroundColor: Colors.teal.shade800,
-        body: SafeArea(
-          child: StreamBuilder(
-            stream: GameService().gameStartStream,
-            builder: (
-              context,
-              AsyncSnapshot<bool> gameStartSnapshot,
-            ) {
-              bool? gameStart =
-                  gameStartSnapshot.hasData ? gameStartSnapshot.data : false;
+    return WillPopScope(
+      onWillPop: () => Alert.showConfirm(
+        context: context,
+        title: 'Salir',
+        content: '¿Quieres salir de la aplicación?',
+      ).then((confirmed) => confirmed ?? false),
+      child: GestureDetector(
+        child: Scaffold(
+          backgroundColor: Colors.teal.shade800,
+          body: SafeArea(
+            child: StreamBuilder(
+              stream: GameService().gameStartStream,
+              builder: (
+                context,
+                AsyncSnapshot<bool> gameStartSnapshot,
+              ) {
+                bool? gameStart =
+                    gameStartSnapshot.hasData ? gameStartSnapshot.data : false;
 
-              if (gameStart == null) {
-                return const SizedBox();
-              }
+                if (gameStart == null) {
+                  return const SizedBox();
+                }
 
-              return Stack(
-                children: [
-                  if (gameStart)
-                    const Positioned(
-                      top: 16,
-                      right: 16,
-                      child: OptionsButton(),
-                    ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (gameStart) ...[
-                        const CurrentTurn(),
-                        const SizedBox(height: 24),
-                      ],
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (!gameStart) const MainTitle(),
-                          if (gameStart) const GameBoard(),
-                        ],
+                return Stack(
+                  children: [
+                    if (gameStart)
+                      const Positioned(
+                        top: 16,
+                        right: 16,
+                        child: OptionsButton(),
                       ),
-                    ],
-                  ),
-                ],
-              );
-            },
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (gameStart) ...[
+                          const CurrentTurn(),
+                          const SizedBox(height: 24),
+                        ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (!gameStart) const MainTitle(),
+                            if (gameStart) const GameBoard(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
