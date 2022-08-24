@@ -44,11 +44,6 @@ class _GameBoardState extends State<GameBoard> {
           return const SizedBox();
         }
 
-        // final List<Position> riskMovements = Utils.getRiskPositions(
-        //   gameBoard: gameBoard,
-        //   teamTurn: GameService().teamTurnSync,
-        // );
-
         final List<Position> availableMovements =
             Utils.getAvailableMovementsForPosition(
           position: selectedPosition,
@@ -68,9 +63,6 @@ class _GameBoardState extends State<GameBoard> {
 
                   final isMovableTile = availableMovements.any((position) =>
                       position.x == colIndex && position.y == rowIndex);
-
-                  // final isRiskTile = riskMovements.any((position) =>
-                  //     position.x == colIndex && position.y == rowIndex);
 
                   return GestureDetector(
                     onTap: () {
@@ -92,11 +84,9 @@ class _GameBoardState extends State<GameBoard> {
                       width: tileSize,
                       child: GameTile(
                         isSelected || isMovableTile
-                            //  || isRiskTile
                             ? gameBoard[colIndex][rowIndex].clone(
                                 isSelected: isSelected,
                                 isMovableTile: isMovableTile,
-                                // isRiskTile: isRiskTile,
                               )
                             : gameBoard[colIndex][rowIndex],
                       ),

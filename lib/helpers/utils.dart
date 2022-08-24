@@ -77,8 +77,6 @@ class Utils {
 
     if (kingPosition == null) return false;
 
-    // Debugger.log('kingPosition: X: ${kingPosition.x}, Y: ${kingPosition.y}');
-
     final List<Position> riskPositions = getRiskPositions(
       gameBoard: gameBoard,
       teamTurn: teamTurn,
@@ -556,16 +554,9 @@ class Utils {
             destinyPosition: validPositions[i - 1],
           );
 
+          // Si tras el movimiento el rey quedara en jaque se elimina el movimiento
           if (isKingInCheck(gameBoard: movementResult, teamTurn: teamTurn)) {
-            // Debugger.log(
-            //   'Mover a la posición X: ${validPositions[i - 1].x} Y: ${validPositions[i - 1].y} no es válido porque el rey está en jaque',
-            // );
-
             validPositions.removeAt(i - 1);
-            // } else {
-            //   Debugger.log(
-            //     'La posición X: ${validPositions[i - 1].x} Y: ${validPositions[i - 1].y} es válida porque el rey no está en jaque',
-            //   );
           }
         }
       }
