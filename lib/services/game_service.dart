@@ -122,6 +122,7 @@ class GameService {
     _gameStartFetcher.sink.add(true);
     _resetGameBoard();
     _turnTeamFetcher.sink.add(PieceTeam.white);
+    _winnerTeamFetcher.sink.add(null);
   }
 
   void finishGame() {
