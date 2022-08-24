@@ -1,3 +1,5 @@
 - Si el rey está en jaque, indicar
 - Histórico de movimientos
   - Poder revertir movimientos
+- Si un peón llega al final del tablero debe convertirse en reina
+- No se puede hacer enroque si el rey está en jaque
