@@ -87,10 +87,7 @@ class Utils {
     final Piece? piece = newGameBoard[originPosition.x][originPosition.y].piece;
 
     newGameBoard[originPosition.x][originPosition.y] = Tile(
-      position: Position(
-        originPosition.x,
-        originPosition.y,
-      ),
+      position: Position(originPosition.x, originPosition.y),
     );
 
     newGameBoard[destinyPosition.x][destinyPosition.y] =

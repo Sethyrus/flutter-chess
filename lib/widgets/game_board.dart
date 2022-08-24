@@ -44,7 +44,7 @@ class _GameBoardState extends State<GameBoard> {
           return const SizedBox();
         }
 
-        final List<Position> availableMovements =
+        final List<Position> availableMovementsforSelectedPosition =
             Utils.getAvailableMovementsForPosition(
           position: selectedPosition,
           gameBoard: gameBoard,
@@ -61,23 +61,24 @@ class _GameBoardState extends State<GameBoard> {
                   final isSelected = selectedPosition?.x == colIndex &&
                       selectedPosition?.y == rowIndex;
 
-                  final isMovableTile = availableMovements.any((position) =>
-                      position.x == colIndex && position.y == rowIndex);
+                  final isMovableTile =
+                      availableMovementsforSelectedPosition.any((position) =>
+                          position.x == colIndex && position.y == rowIndex);
 
                   return GestureDetector(
                     onTap: () {
                       if (isMovableTile) {
                         GameService().movePiece(
                           selectedPosition!,
-                          availableMovements.firstWhere((position) =>
-                              position.x == colIndex && position.y == rowIndex),
+                          availableMovementsforSelectedPosition.firstWhere(
+                              (position) =>
+                                  position.x == colIndex &&
+                                  position.y == rowIndex),
                         );
                       }
 
-                      setState(() {
-                        selectedPosition =
-                            gameBoard[colIndex][rowIndex].position;
-                      });
+                      setState(() => selectedPosition =
+                          gameBoard[colIndex][rowIndex].position);
                     },
                     child: SizedBox(
                       height: tileSize,
