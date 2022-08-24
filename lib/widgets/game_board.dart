@@ -18,18 +18,22 @@ class _GameBoardState extends State<GameBoard> {
   @override
   Widget build(BuildContext context) {
     // Cálculo del tamaño del cuadrao
+    const int tilesPerSide = 8;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
     double minSideSize = 0;
     double tileSize = 0;
+    double offset = 0;
 
-    if (screenHeight > screenWidth) {
+    if (screenHeight > (screenWidth + 64)) {
       minSideSize = screenWidth;
+      offset = 32;
     } else {
       minSideSize = screenHeight;
+      offset = 128;
     }
 
-    tileSize = ((minSideSize - 200) / 8);
+    tileSize = ((minSideSize - offset) / tilesPerSide);
 
     return StreamBuilder(
       stream: GameService().gameBoardStream,
