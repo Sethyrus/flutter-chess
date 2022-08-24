@@ -39,10 +39,10 @@ class _GameBoardState extends State<GameBoard> {
       stream: GameService().gameBoardStream,
       builder: (
         context,
-        AsyncSnapshot<List<List<Tile>>> gameMatrixSnapshot,
+        AsyncSnapshot<List<List<Tile>>> gameBoardSnapshot,
       ) {
         final List<List<Tile>>? gameBoard =
-            gameMatrixSnapshot.hasData ? gameMatrixSnapshot.data : null;
+            gameBoardSnapshot.hasData ? gameBoardSnapshot.data : null;
 
         if (gameBoard == null) {
           return const SizedBox();

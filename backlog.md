@@ -1,4 +1,3 @@
-- Matrix -> Board
 - Si el rey está en jaque, indicar
 - Histórico de movimientos
   - Poder revertir movimientos
