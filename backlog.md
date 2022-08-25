@@ -3,3 +3,8 @@
   - Poder revertir movimientos
 - Si un peón llega al final del tablero debe convertirse en reina
 - No se puede hacer enroque si el rey está en jaque
+- BUG: en posición
+  - Peón negro 1-1 atacando a rey 0-2
+  - Reina negra 5-1
+  - Dos casillas a la derecha del rey libres
+  - Hay jaque mate, averiguar por qué

@@ -1,4 +1,5 @@
 import 'package:chess_one/helpers/utils.dart';
+import 'package:chess_one/models/piece.dart';
 import 'package:chess_one/models/position.dart';
 import 'package:chess_one/models/tile.dart';
 import 'package:chess_one/services/game_service.dart';
@@ -48,6 +49,11 @@ class _GameBoardState extends State<GameBoard> {
           return const SizedBox();
         }
 
+        final List<Position> riskMovements = Utils.getRiskPositions(
+          gameBoard: gameBoard,
+          turnTeam: GameService().turnTeamSync,
+        );
+
         final List<Position> availableMovementsforSelectedPosition =
             Utils.getAvailableMovementsForPosition(
           position: selectedPosition,
@@ -69,6 +75,21 @@ class _GameBoardState extends State<GameBoard> {
                       availableMovementsforSelectedPosition.any((position) =>
                           position.x == colIndex && position.y == rowIndex);
 
+                  // Debugger.log(
+                  //   'gameBoard[colIndex][rowIndex] X: ${gameBoard[colIndex][rowIndex].position.x} Y: ${gameBoard[colIndex][rowIndex].position.y}',
+                  //   'position X: ${position.x} Y: ${position.y}',
+                  // );
+
+                  // final isRiskTile = riskMovements.any((position) =>
+                  //     position.x == colIndex && position.y == rowIndex);
+
+                  final isRiskTile =
+                      gameBoard[colIndex][rowIndex].piece?.type ==
+                              PieceType.king
+                          ? riskMovements.any((position) =>
+                              position.x == colIndex && position.y == rowIndex)
+                          : false;
+
                   return GestureDetector(
                     onTap: () {
                       if (isMovableTile) {
@@ -88,10 +109,11 @@ class _GameBoardState extends State<GameBoard> {
                       height: tileSize,
                       width: tileSize,
                       child: GameTile(
-                        isSelected || isMovableTile
+                        isSelected || isMovableTile || isRiskTile
                             ? gameBoard[colIndex][rowIndex].clone(
                                 isSelected: isSelected,
                                 isMovableTile: isMovableTile,
+                                isRiskTile: isRiskTile,
                               )
                             : gameBoard[colIndex][rowIndex],
                       ),
