@@ -51,7 +51,7 @@ class GameService {
     _gameBoardFetcher.sink.add(cleanGameBoard);
   }
 
-  void movePiece(Position originPosition, Position destinyPosition) {
+  void movePiece(Position originPosition, Position targetPosition) {
     final List<List<Tile>> newGameBoard = gameBoardSync;
     final Piece? piece = newGameBoard[originPosition.x][originPosition.y].piece;
 
@@ -62,21 +62,21 @@ class GameService {
       ),
     );
 
-    newGameBoard[destinyPosition.x][destinyPosition.y] =
+    newGameBoard[targetPosition.x][targetPosition.y] =
         newGameBoard[originPosition.x][originPosition.y].clone(
       piece: piece?.clone(hasBeenMoved: true),
-      position: Position(destinyPosition.x, destinyPosition.y),
+      position: Position(targetPosition.x, targetPosition.y),
     );
 
-    if (destinyPosition.isCastling) {
+    if (targetPosition.isCastling) {
       if (piece?.team == PieceTeam.white) {
-        if (destinyPosition.x == 5) {
+        if (targetPosition.x == 5) {
           newGameBoard[4][0] = newGameBoard[7][0].clone(
             piece: newGameBoard[7][0].piece?.clone(hasBeenMoved: true),
             position: Position(4, 0),
           );
           newGameBoard[7][0] = Tile(position: Position(7, 0));
-        } else if (destinyPosition.x == 1) {
+        } else if (targetPosition.x == 1) {
           newGameBoard[2][0] = newGameBoard[0][0].clone(
             piece: newGameBoard[0][0].piece?.clone(hasBeenMoved: true),
             position: Position(2, 0),
@@ -84,13 +84,13 @@ class GameService {
           newGameBoard[0][0] = Tile(position: Position(0, 0));
         }
       } else if (piece?.team == PieceTeam.black) {
-        if (destinyPosition.x == 1) {
+        if (targetPosition.x == 1) {
           newGameBoard[2][7] = newGameBoard[0][7].clone(
             piece: newGameBoard[0][7].piece?.clone(hasBeenMoved: true),
             position: Position(2, 7),
           );
           newGameBoard[0][7] = Tile(position: Position(0, 7));
-        } else if (destinyPosition.x == 5) {
+        } else if (targetPosition.x == 5) {
           newGameBoard[4][7] = newGameBoard[7][7].clone(
             piece: newGameBoard[7][7].piece?.clone(hasBeenMoved: true),
             position: Position(4, 7),
